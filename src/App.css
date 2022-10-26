@@ -1,0 +1,24 @@
+html,body { height: 100%; margin: 0px; padding: 0px; }
+#root { background: #282c34; height: 100% }
+
+.segmentClass {
+  background-color: #282c34!important;
+}
+
+.gridRowClass {
+  padding: 0rem 1rem;
+}
+
+.statistisClass {
+  justify-content: center!important;
+  padding-bottom: 25px!important;
+}
+
+canvas {
+  background-color: #ffffff!important;
+}
+
+.ui.stackable.grid > .row > .column.wide.noPadding {
+  padding: 0 !important;
+  border-spacing: 0 !important;
+}
