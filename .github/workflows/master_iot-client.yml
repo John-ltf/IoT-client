@@ -50,6 +50,7 @@ jobs:
           echo "REACT_APP_IOT_WEB_API=${{ steps.secretsAction.outputs.REACT-APP-IOT-WEB-API }}" >> .env
           echo "REACT_APP_IOT_WEB_API_SCOPE=${{ steps.secretsAction.outputs.REACT-APP-IOT-WEB-API-SCOPE }}" >> .env
           ls
+          cat .env
 
       - name: npm install, build, and test
         run: |
