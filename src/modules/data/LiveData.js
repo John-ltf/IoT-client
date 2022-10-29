@@ -8,7 +8,7 @@ const LiveData = ({ deviceData }) => {
   function getMetrics(){
     switch(deviceData["deviceType"]) {
       case 'LYWSD03MMC':
-        return (<Statistic.Group className='statistisClass' size="huge">
+        return (<Statistic.Group className='statistisClass' size="large">
                   <Statistic color="purple" inverted>
                     <Statistic.Value>{deviceData["recentData"]["telemetry"]["temperature"]}</Statistic.Value>
                     <Statistic.Label color="purple">temperature - ({deviceData["deviceUnits"]["temperature"]})</Statistic.Label>
@@ -20,7 +20,7 @@ const LiveData = ({ deviceData }) => {
                 </Statistic.Group>);
 
       case 'MIBFS':
-        return (<Statistic.Group className='statistisClass' size="large">
+        return (<Statistic.Group className='statistisClass' size="medium">
                   <Statistic color="purple" inverted>
                     <Statistic.Value>{Math.round(deviceData["recentData"]["telemetry"]["bodyFat"] * 100) / 100}</Statistic.Value>
                     <Statistic.Label color="purple">body Fat - (%)</Statistic.Label>
@@ -41,22 +41,16 @@ const LiveData = ({ deviceData }) => {
 
   if(deviceData === null)
     return (
-      <Segment>
+      <>
         <Dimmer active>
           <Loader size='massive'>Loading</Loader>
         </Dimmer>
-        <div className='statistisClass' >
-          <Header as='h1'>No Recent Data</Header>
-        </div>
-      </Segment>
+        <Header inverted as='h1'>No Recent Data</Header>
+      </>
     )
   else if(deviceData["recentData"] === undefined)
   return (
-    <Segment>
-      <div className='statistisClass' >
-        <Header as='h1'>No Recent Data</Header>
-      </div>
-    </Segment>
+    <Header inverted as='h1'>No Recent Data</Header>
   )
 
   return (

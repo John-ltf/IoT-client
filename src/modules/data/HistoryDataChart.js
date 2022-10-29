@@ -221,26 +221,28 @@ const HistoryDataChart = ({deviceData}) =>{
 
   return (
     <div>
-      <Line
-        ref={chartRef}
-        onTouchStart={onZoomInStart}
-        onTouchEnd={onZoomInEnd}
-        onMouseDown={onZoomInStart}
-        onMouseUp={onZoomInEnd}
-        onDoubleClick={onZoumOut}
-        options={options}
-        data={data}
-      />
-      <Segment inverted>
-      {
-        Object.keys(deviceData.deviceUnits).map((key, index) =>
-          {
-            return (
-              <Button inverted onClick={handleMetricSelect} value={key} key={key} color='purple'>{key}</Button>
-            )
-          }
-        )
-      }
+      <Segment color='purple'>
+        <Line
+          ref={chartRef}
+          onTouchStart={onZoomInStart}
+          onTouchEnd={onZoomInEnd}
+          onMouseDown={onZoomInStart}
+          onMouseUp={onZoomInEnd}
+          onDoubleClick={onZoumOut}
+          options={options}
+          data={data}
+        />
+        <Segment inverted>
+        {
+          Object.keys(deviceData.deviceUnits).map((key, index) =>
+            {
+              return (
+                <Button inverted onClick={handleMetricSelect} value={key} key={key} color='purple'>{key}</Button>
+              )
+            }
+          )
+        }
+        </Segment>
       </Segment>
     </div>
   )

@@ -6,7 +6,7 @@ import 'react-semantic-ui-datepickers/dist/react-semantic-ui-datepickers.css';
 import IotUtils from '../common/IoTutils';
 import { toast } from 'react-toastify';
 
-const NewDevice = () => {
+const NewDevice = ({newDeviceCompleted, objectId}) => {
   const [activeDimmer, setActiveDimmer] = useState(false);
   const [telemetryData, setTelemetryData] = useState(false)
   const [controller, setController] = useState(false)
@@ -29,7 +29,7 @@ const NewDevice = () => {
       //wait for actual register on IoT hub
       while(true){
         await new Promise(resolve => setTimeout(resolve, 5000));
-        if( await axiosAgent.Device.get(deviceId + "_" + mac, {'user':'john'}) !== 0)
+        if( await axiosAgent.Device.get(deviceId + "_" + mac, {'user':objectId}) !== 0)
           break;
       }
       setActiveDimmer(false);
@@ -42,7 +42,7 @@ const NewDevice = () => {
         await new Promise(resolve => setTimeout(resolve, 5000));
         try {
           response = await axiosAgent.Device.update(deviceId,
-              {'user':'john', 'updateType': type, 'updateName': name, 'updateValue': value});
+              {'user':objectId, 'updateType': type, 'updateName': name, 'updateValue': value});
         }
         catch(error){
           response = ""
@@ -52,8 +52,9 @@ const NewDevice = () => {
       }
       setActiveDimmer(false);
       if(response === false){
-        console.log('error update')
+        console.error('error update')
         toast.error(`Cannot register device: ${deviceId}`);
+        setActiveDimmer(false);
         return false;
       }
       return true;
@@ -62,7 +63,7 @@ const NewDevice = () => {
     event.preventDefault();
     const {target} = event;
     let body = {
-      "user": "john",
+      "user": objectId,
       "nickName": target.NickName.value,
       "mac": target.MacAddress.value,
       "telemetryData": target.TelemetryData.checked,
@@ -93,6 +94,8 @@ const NewDevice = () => {
         }
       }
     }
+
+    newDeviceCompleted();
   }
 
   function enableTelemertyFields(){

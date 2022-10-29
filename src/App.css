@@ -1,12 +1,36 @@
-html,body { height: 100%; margin: 0px; padding: 0px; }
-#root { background: #282c34; height: 100% }
+html,body {  min-height: 100%; margin: 0px; padding: 0px; }
+#root { background: #282c34;  min-height: 100%; }
 
 .segmentClass {
   background-color: #282c34!important;
 }
 
-.gridRowClass {
-  padding: 0rem 1rem;
+.segmentClassNoPadding {
+  background-color: #282c34!important;
+  padding: 0 !important;
+}
+
+.segmentClassSmaller {
+  background-color: #282c34!important;
+  margin: auto !important;
+  width: 70% !important;
+  padding: 0 !important;
+}
+
+.noTopPadding {
+  padding-top: 0 !important;
+}
+
+.noTopHorPadding {
+  padding-top: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+.BottomPadding {
+  padding-bottom: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
 }
 
 .statistisClass {
@@ -21,4 +45,9 @@ canvas {
 .ui.stackable.grid > .row > .column.wide.noPadding {
   padding: 0 !important;
   border-spacing: 0 !important;
+}
+
+.historyTable
+{
+  word-break: break-word;
 }

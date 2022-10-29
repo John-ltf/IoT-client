@@ -20,6 +20,19 @@ function getTag(device, tag){
   return "";
 }
 
+function setTag(device, tag, value, addNewEntry = true){
+  if(typeof value !== 'string')
+    value = value.toString()
+
+  if(device === null|| typeof device === 'undefined') //no device is set
+        return false;
+  if(tag in device.tags.tags)
+    device.tags.tags[tag] = value;
+  if(addNewEntry)
+    device.tags.tags[tag] = value;
+  return true;
+}
+
 function getMac(device){
     if(device === null|| typeof device === 'undefined') //no device is set
         return "";
@@ -55,6 +68,20 @@ function getDesiredProperty(device, property){
   if(device.desiredProperties && property in device.desiredProperties )
     return device.desiredProperties[property];
   return null;
+}
+
+function setDesiredProperty(device, property, value, addNewEntry = true){
+  if(typeof value !== 'string')
+    value = value.toString()
+
+  if(device === null|| typeof device === 'undefined') //no device is set
+      return false;
+
+  if(device.desiredProperties && property in device.desiredProperties )
+    device.desiredProperties[property] = value;
+  if(addNewEntry)
+    device.desiredProperties[property] = value;
+  return true;
 }
 
 function getReportedUnitProperties(device){
@@ -138,8 +165,10 @@ export default {
   getDeviceName,
   getMac,
   getTag,
+  setTag,
   getStatus,
   getDesiredProperty,
+  setDesiredProperty,
   getReportedProperty,
   getReportedUnitProperties,
   isEnabled,

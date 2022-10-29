@@ -7,8 +7,8 @@ axios.defaults.baseURL = process.env.REACT_APP_API_URL;
 
 axios.interceptors.request.use(
   config => {
-    const token = window.localStorage.getItem('jwt');
-    if (token) config.headers.Authorization = `Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6Ilg1ZVhrNHh5b2pORnVtMWtsMll0djhkbE5QNC1jNTdkTzZRR1RWQndhTmsifQ.eyJleHAiOjE2NjY3NzY5NTksIm5iZiI6MTY2Njc3MzM1OSwidmVyIjoiMS4wIiwiaXNzIjoiaHR0cHM6Ly9qb2hubHRmLmIyY2xvZ2luLmNvbS9lYmFiM2VkNi0wM2NlLTQwZWUtYjk5OS04NDk3MzAyODExMTkvdjIuMC8iLCJzdWIiOiJhYzE1ZDVjNi0yODUxLTRkOGYtOGRlMy03YjBlM2VkNTZmODAiLCJhdWQiOiJmMzY3MWY4OS1kZTE3LTRlYjMtYjI0ZC04ZWZiZDFiNTFlYWEiLCJub25jZSI6ImRlZmF1bHROb25jZSIsImlhdCI6MTY2Njc3MzM1OSwiYXV0aF90aW1lIjoxNjY2NzczMzU5LCJuYW1lIjoiR2lhbm5pcyBMYXRpZmlzIiwiaWRwIjoiZ29vZ2xlLmNvbSIsImNvdW50cnkiOiJHcmVlY2UiLCJlbWFpbHMiOlsibGF0aWZpcy5naWFubmlzQGdtYWlsLmNvbSJdLCJ0ZnAiOiJCMkNfMV9zaWdudXBzaWduaW4xIn0.qBP8wtt2PKGE1FrbimVUf6C3Z_bammIIeZ_jw-t8QhK4F6cPh4amkKO0nFqHvmtRIU70017PQJuhWbCqoFk4Xq9FkgALia0QPkVbO4l-VWDVdq2rmUmluAX0Q7b5rkKs1uEOGkWRywXkLxonwBGUbyQmhOsj_faq98wihqClB8Qrxo4FGSfmI0sEmtpzidQa7mlTt_u3yB9LfvusUeFKEVTgk5EmWwl-NcVIrbZyRj0CV-ZlAc5ERUH43voWn-olCgADK95K4Xnd6Kuu4qO_3NXT2cQg-E6_PQOueESXdtigzfX76o4psEkIDnTHUr5Bd2cBG4wYJ3RJei9U88NYiw`;
+    //const token = window.localStorage.getItem('jwt');
+    //if (token) config.headers.Authorization = `Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6Ilg1ZVhrNHh5b2pORnVtMWtsMll0djhkbE5QNC1jNTdkTzZRR1RWQndhTmsifQ.eyJleHAiOjE2NjY3NzY5NTksIm5iZiI6MTY2Njc3MzM1OSwidmVyIjoiMS4wIiwiaXNzIjoiaHR0cHM6Ly9qb2hubHRmLmIyY2xvZ2luLmNvbS9lYmFiM2VkNi0wM2NlLTQwZWUtYjk5OS04NDk3MzAyODExMTkvdjIuMC8iLCJzdWIiOiJhYzE1ZDVjNi0yODUxLTRkOGYtOGRlMy03YjBlM2VkNTZmODAiLCJhdWQiOiJmMzY3MWY4OS1kZTE3LTRlYjMtYjI0ZC04ZWZiZDFiNTFlYWEiLCJub25jZSI6ImRlZmF1bHROb25jZSIsImlhdCI6MTY2Njc3MzM1OSwiYXV0aF90aW1lIjoxNjY2NzczMzU5LCJuYW1lIjoiR2lhbm5pcyBMYXRpZmlzIiwiaWRwIjoiZ29vZ2xlLmNvbSIsImNvdW50cnkiOiJHcmVlY2UiLCJlbWFpbHMiOlsibGF0aWZpcy5naWFubmlzQGdtYWlsLmNvbSJdLCJ0ZnAiOiJCMkNfMV9zaWdudXBzaWduaW4xIn0.qBP8wtt2PKGE1FrbimVUf6C3Z_bammIIeZ_jw-t8QhK4F6cPh4amkKO0nFqHvmtRIU70017PQJuhWbCqoFk4Xq9FkgALia0QPkVbO4l-VWDVdq2rmUmluAX0Q7b5rkKs1uEOGkWRywXkLxonwBGUbyQmhOsj_faq98wihqClB8Qrxo4FGSfmI0sEmtpzidQa7mlTt_u3yB9LfvusUeFKEVTgk5EmWwl-NcVIrbZyRj0CV-ZlAc5ERUH43voWn-olCgADK95K4Xnd6Kuu4qO_3NXT2cQg-E6_PQOueESXdtigzfX76o4psEkIDnTHUr5Bd2cBG4wYJ3RJei9U88NYiw`;
     return config;
   },
   error => {
@@ -59,6 +59,15 @@ const History = {
     axios.post(`${process.env.REACT_APP_SIGNALR_URL}/api/delete/${device}/${telemetryId}`, body).then(responseBody)
 }
 
+const IoTMessagingHeaders = {
+  'accept': 'text/plain',
+  'Content-Type': 'application/json'
+}
+const IoTMessaging = {
+  directMethod: (deviceId, body) =>
+    axios.post(`${process.env.REACT_APP_API_IOT_MSG_URL}/direct-method/${deviceId}`, body, {headers: IoTMessagingHeaders }).then(responseBody)
+}
+
 const client = axios.create({
   baseURL: process.env.REACT_APP_SIGNALR_URL,
   withCredentials: false,
@@ -102,6 +111,7 @@ export default {
   client,
   Devices,
   Device,
+  IoTMessaging,
   signalR,
   History
 };

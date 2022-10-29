@@ -1,14 +1,17 @@
 import React, { useState, useEffect, memo } from 'react';
-import {Label} from 'semantic-ui-react';
+import {Label, Segment, Tab, Grid} from 'semantic-ui-react';
 import apiAgents from '../api/apiAgents';
 import LiveData from './data/LiveData';
+import Controller from './controller/Controller';
 import Data from './data/Data';
-import HistoryData from './data/HistoryData';
+import DeviceInfo from './info/DeviceInfo';
+import HistoryDataTable from './data/HistoryDataTable';
+import HistoryDataChart from './data/HistoryDataChart';
 import IotUtils from '../common/IoTutils';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-const DevicesData = ({ device }) => {
+const DeviceData = ({ device, deleteDevice, objectId}) => {
   const [ registeredLiveDeviceId, setRegisteredLiveDeviceId ] = useState(null);
   const [ registeredHistoryDeviceId, setRegisteredHistoryDeviceId ] = useState(null);
   const [ liveConnection, setLiveConnection ] = useState(null);
@@ -16,6 +19,7 @@ const DevicesData = ({ device }) => {
   const [ deviceLiveData, setDeviceLiveData] = useState(null);
   const [ deviceHistoryData, setDeviceHistoryData] = useState(null);
   const [telemetryData, setTelemetryData] = useState(false)
+  const [controller, setController] = useState(false)
 
    useEffect(() => {
     Data.deviceReset();
@@ -24,15 +28,16 @@ const DevicesData = ({ device }) => {
     if(liveConnection && registeredLiveDeviceId)
       onNewLiveConnection(registeredLiveDeviceId)
     else
-      apiAgents.signalR.init("live","john", setLiveConnection);
+      apiAgents.signalR.init("live",objectId, setLiveConnection);
 
     if(historyConnection && registeredHistoryDeviceId)
       onNewHistoryConnection(registeredHistoryDeviceId)
     else
-      apiAgents.signalR.init("history","john", setHistoryConnection);
+      apiAgents.signalR.init("history",objectId, setHistoryConnection);
 
-    apiAgents.Device.get(device.deviceId, {'user':'john'}).then(response => {
+    apiAgents.Device.get(device.deviceId, {'user':objectId}).then(response => {
       setTelemetryData(IotUtils.toBoolean(IotUtils.getDesiredProperty(response[0], 'TelemetryData')))
+      setController(IotUtils.toBoolean(IotUtils.getDesiredProperty(response[0], 'Controller')))
       Data.setDeviceType(IotUtils.getReportedProperty(response[0], 'DeviceType')) && setDeviceLiveData(Data.getDeviceLiveData());
       Data.setDeviceUnits(IotUtils.getReportedUnitProperties(response[0])) && setDeviceLiveData(Data.getDeviceLiveData());
       if(Data.allHistorySet()) setDeviceHistoryData(Data.getDeviceHistoryData());
@@ -43,14 +48,14 @@ const DevicesData = ({ device }) => {
     var timeStart = new Date();
     timeStart.setMonth(timeStart.getMonth() - 32)
 
-    apiAgents.History.fetch(device.deviceId, timeStart.toISOString(), {'user':'john'}).then(response => {
+    apiAgents.History.fetch(device.deviceId, timeStart.toISOString(), {'user':objectId}).then(response => {
       Data.setDeviceRecentDataIfNotExist(response[0]) && setDeviceLiveData(Data.getDeviceLiveData());
       Data.setHistory(response) && setDeviceHistoryData(Data.getDeviceHistoryData());
     }).catch(error =>{
       toast.error(error);
     });
 
-  }, [device]);
+  }, [device, objectId]);
 
   useEffect(() => {
     if (liveConnection)
@@ -103,34 +108,77 @@ const DevicesData = ({ device }) => {
     toast.error('disconnected');
   }
 
+  function OtherData({telemetryData, deviceHistoryData}){
+
+    if(deviceHistoryData === null)
+      return (<div></div>)
+
+    const InfoDataPane = {
+      menuItem: 'Device Info',
+      render: () => <DeviceInfo device={device} deleteDevice={deleteDevice} objectId={objectId}></DeviceInfo>
+    }
+
+    const ChartDataPane = {
+      menuItem: 'Metrics Chart',
+      render: () => <HistoryDataChart deviceData={deviceHistoryData}></HistoryDataChart>
+    }
+
+    const historyDataPane = {
+      menuItem: 'History Table',
+      render: () => <HistoryDataTable deviceData={deviceHistoryData} ></HistoryDataTable>
+    }
+    if(telemetryData)
+      return (<Tab menu={{ pointing: true }} panes={[InfoDataPane, ChartDataPane, historyDataPane]} />)
+    return (<Tab menu={{ pointing: true }} panes={[InfoDataPane]} />)
+  }
+
   return (
     <div>
-    {
-      telemetryData?
-      (
-        <div>
-          <div className='statistisClass' >
-            <LiveData deviceData={deviceLiveData} />
-            {
-              liveConnection === null || historyConnection === null?
-              (
-                <Label color="red">
-                  Not streaming
-                </Label>
-              ) : (
-                <Label color="green">
-                  streaming
-                </Label>
-              )
-            }
-          </div>
-          <HistoryData deviceData={deviceHistoryData} />
-        </div>
-      )
-      : (<div></div>)
-    }
+      <Segment id='0' className="segmentClassSmaller" inverted basic textAlign={"center"}>
+        <Grid>
+          <Grid.Row className='noTopHorPadding' columns={(telemetryData && controller)? 2 : 1}>
+          {
+            controller?
+            (
+              <Grid.Column className='noTopHorPadding'>
+                <Segment  basic textAlign={"center"}>
+                  <Controller device={device} objectId={objectId} />
+                </Segment>
+              </Grid.Column>
+            )
+            : (<></>)
+          }
+          {
+            telemetryData?
+            (
+              <Grid.Column className='noTopHorPadding'>
+                <Segment basic textAlign={"center"}>
+                  <LiveData deviceData={deviceLiveData} />
+                  {
+                    liveConnection === null || historyConnection === null?
+                    (
+                      <Label color="red">
+                        Not streaming
+                      </Label>
+                    ) : (
+                      <Label color="green">
+                        streaming
+                      </Label>
+                    )
+                  }
+                </Segment>
+              </Grid.Column>
+            )
+            : (<></>)
+          }
+          </Grid.Row>
+        </Grid>
+        </Segment>
+      <Segment className="segmentClassSmaller" inverted basic textAlign={"center"}>
+        <OtherData telemetryData={telemetryData} deviceHistoryData={deviceHistoryData}/>
+      </Segment>
     </div>
   )
 };
 
-export default memo(DevicesData);
+export default memo(DeviceData);
