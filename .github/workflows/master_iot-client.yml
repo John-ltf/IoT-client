@@ -20,6 +20,35 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: '18.x'
+      
+      - name: Checkout
+        uses: actions/checkout@v2
+      
+      - name: Azure Login
+        uses: Azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      
+      - name: Fetch Secrets from Key vault
+        uses: Azure/get-keyvault-secrets@v1
+        with: 
+          keyvault: "iot-secrets"
+          secrets: 'REACT-APP-IOT-WEB-API-SCOPE, REACT-APP-IOT-WEB-API,REACT-APP-CLIENT-ID,REACT-APP-TENANT,REACT-APP-USER-FLOW-RESET,REACT-APP-USER-FLOW-EDIT,REACT-APP-USER-FLOW-SIGN,REACT-APP-HUB-NAME,REACT-APP-SIGNALR-URL,REACT-APP-API-IOT-MSG-URL,REACT-APP-API-URL'
+        id: secretsAction
+      
+      - name: Create .env file for build
+        run: |
+          echo "REACT_APP_API_URL=${{ steps.secretsAction.outputs.REACT-APP-IOT-WEB-API-SCOPE }}" > .env
+          echo "REACT_APP_API_IOT_MSG_URL=${{ steps.secretsAction.outputs.REACT-APP-API-IOT-MSG-URL }}" >> .env
+          echo "REACT_APP_SIGNALR_URL=${{ steps.secretsAction.outputs.REACT-APP-SIGNALR-URL }}" >> .env
+          echo "REACT_APP_HUB_NAME=${{ steps.secretsAction.outputs.REACT-APP-HUB-NAME }}" >> .env
+          echo "REACT_APP_USER_FLOW_SIGN=${{ steps.secretsAction.outputs.REACT-APP-USER-FLOW-SIGN }}" >> .env
+          echo "REACT_APP_USER_FLOW_EDIT=${{ steps.secretsAction.outputs.REACT-APP-USER-FLOW-EDIT }}" >> .env
+          echo "REACT_APP_USER_FLOW_RESET=${{ steps.secretsAction.outputs.REACT-APP-USER-FLOW-RESET }}" >> .env
+          echo "REACT_APP_TENANT=${{ steps.secretsAction.outputs.REACT-APP-TENANT }}" >> .env
+          echo "REACT_APP_CLIENT_ID=${{ steps.secretsAction.outputs.REACT-APP-CLIENT-ID }}" >> .env
+          echo "REACT_APP_IOT_WEB_API=${{ steps.secretsAction.outputs.REACT-APP-IOT-WEB-API }}" >> .env
+          echo "REACT_APP_IOT_WEB_API_SCOPE=${{ steps.secretsAction.outputs.REACT-APP-IOT-WEB-API-SCOPE }}" >> .env
 
       - name: npm install, build, and test
         run: |
@@ -32,7 +61,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: node-app
-          path: .
+          path: ./build
 
   deploy:
     runs-on: ubuntu-latest
