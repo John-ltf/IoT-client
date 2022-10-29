@@ -38,7 +38,7 @@ jobs:
       
       - name: Create .env file for build
         run: |
-          echo "REACT_APP_API_URL=${{ steps.secretsAction.outputs.REACT-APP-IOT-WEB-API-SCOPE }}" > .env.production
+          echo "REACT_APP_API_URL=${{ steps.secretsAction.outputs.REACT-APP-API-URL }}" > .env.production
           echo "REACT_APP_API_IOT_MSG_URL=${{ steps.secretsAction.outputs.REACT-APP-API-IOT-MSG-URL }}" >> .env.production
           echo "REACT_APP_SIGNALR_URL=${{ steps.secretsAction.outputs.REACT-APP-SIGNALR-URL }}" >> .env.production
           echo "REACT_APP_HUB_NAME=${{ steps.secretsAction.outputs.REACT-APP-HUB-NAME }}" >> .env.production
