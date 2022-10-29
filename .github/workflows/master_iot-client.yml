@@ -51,6 +51,8 @@ jobs:
           echo "REACT_APP_IOT_WEB_API_SCOPE=${{ steps.secretsAction.outputs.REACT-APP-IOT-WEB-API-SCOPE }}" >> .env.production1
           ls
           cat .env.production1
+          cat .env.production
+          diff .env.production .env.production1
 
       - name: npm install, build, and test
         run: |
