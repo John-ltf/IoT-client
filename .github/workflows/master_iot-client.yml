@@ -21,16 +21,23 @@ jobs:
         with:
           node-version: '18.x'
       
-      - uses: actions/checkout@v2
-      - uses: Azure/login@v1
+      - name: Checkout
+        uses: actions/checkout@v2
+      
+      - name: Azure Login
+        uses: Azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
-      - uses: Azure/get-keyvault-secrets@v1
+      
+      - name: Fetch Secrets from Key vault
+        uses: Azure/get-keyvault-secrets@v1
         with: 
           keyvault: "iot-secrets"
           secrets: 'REACT-APP-IOT-WEB-API-SCOPE, REACT-APP-IOT-WEB-API,REACT-APP-CLIENT-ID,REACT-APP-TENANT,REACT-APP-USER-FLOW-RESET,REACT-APP-USER-FLOW-EDIT,REACT-APP-USER-FLOW-SIGN,REACT-APP-HUB-NAME,REACT-APP-SIGNALR-URL,REACT-APP-API-IOT-MSG-URL,REACT-APP-API-URL'
         id: secretsAction
-      - run: |
+      
+      - name: Create .env file for build
+        run: |
           echo "REACT_APP_API_URL=${{ steps.secretsAction.outputs.REACT-APP-IOT-WEB-API-SCOPE }}" > .env
           echo "REACT_APP_API_IOT_MSG_URL=${{ steps.secretsAction.outputs.REACT-APP-API-IOT-MSG-URL }}" >> .env
           echo "REACT_APP_SIGNALR_URL=${{ steps.secretsAction.outputs.REACT-APP-SIGNALR-URL }}" >> .env
@@ -42,7 +49,6 @@ jobs:
           echo "REACT_APP_CLIENT_ID=${{ steps.secretsAction.outputs.REACT-APP-CLIENT-ID }}" >> .env
           echo "REACT_APP_IOT_WEB_API=${{ steps.secretsAction.outputs.REACT-APP-IOT-WEB-API }}" >> .env
           echo "REACT_APP_IOT_WEB_API_SCOPE=${{ steps.secretsAction.outputs.REACT-APP-IOT-WEB-API-SCOPE }}" >> .env
-
 
       - name: npm install, build, and test
         run: |
