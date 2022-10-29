@@ -42,13 +42,13 @@ jobs:
           echo "REACT_APP_API_IOT_MSG_URL=${{ steps.secretsAction.outputs.REACT-APP-API-IOT-MSG-URL }}" >> .env.production
           echo "REACT_APP_SIGNALR_URL=${{ steps.secretsAction.outputs.REACT-APP-SIGNALR-URL }}" >> .env.production
           echo "REACT_APP_HUB_NAME=${{ steps.secretsAction.outputs.REACT-APP-HUB-NAME }}" >> .env.production
-          echo "REACT_APP_USER_FLOW_SIGN=\"${{ steps.secretsAction.outputs.REACT-APP-USER-FLOW-SIGN }}\"" >> .env.production
-          echo "REACT_APP_USER_FLOW_EDIT=\"${{ steps.secretsAction.outputs.REACT-APP-USER-FLOW-EDIT }}\"" >> .env.production
-          echo "REACT_APP_USER_FLOW_RESET=\"${{ steps.secretsAction.outputs.REACT-APP-USER-FLOW-RESET }}\"" >> .env.production
-          echo "REACT_APP_TENANT=\"${{ steps.secretsAction.outputs.REACT-APP-TENANT }}\"" >> .env.production
-          echo "REACT_APP_CLIENT_ID=\"${{ steps.secretsAction.outputs.REACT-APP-CLIENT-ID }}\"" >> .env.production
-          echo "REACT_APP_IOT_WEB_API=\"${{ steps.secretsAction.outputs.REACT-APP-IOT-WEB-API }}\"" >> .env.production
-          echo "REACT_APP_IOT_WEB_API_SCOPE=\"${{ steps.secretsAction.outputs.REACT-APP-IOT-WEB-API-SCOPE }}\"" >> .env.production
+          echo "REACT_APP_USER_FLOW_SIGN=/"${{ steps.secretsAction.outputs.REACT-APP-USER-FLOW-SIGN }}/"" >> .env.production
+          echo "REACT_APP_USER_FLOW_EDIT=/"${{ steps.secretsAction.outputs.REACT-APP-USER-FLOW-EDIT }}/"" >> .env.production
+          echo "REACT_APP_USER_FLOW_RESET=/"${{ steps.secretsAction.outputs.REACT-APP-USER-FLOW-RESET }}/"" >> .env.production
+          echo "REACT_APP_TENANT=/"${{ steps.secretsAction.outputs.REACT-APP-TENANT }}/"" >> .env.production
+          echo "REACT_APP_CLIENT_ID=/"${{ steps.secretsAction.outputs.REACT-APP-CLIENT-ID }}/"" >> .env.production
+          echo "REACT_APP_IOT_WEB_API=/"${{ steps.secretsAction.outputs.REACT-APP-IOT-WEB-API }}/"" >> .env.production
+          echo "REACT_APP_IOT_WEB_API_SCOPE=/"${{ steps.secretsAction.outputs.REACT-APP-IOT-WEB-API-SCOPE }}/"" >> .env.production
           ls
           cat .env.production
 
