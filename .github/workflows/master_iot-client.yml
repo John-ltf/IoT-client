@@ -49,7 +49,7 @@ jobs:
           echo "REACT_APP_CLIENT_ID=${{ steps.secretsAction.outputs.REACT-APP-CLIENT-ID }}" >> .env
           echo "REACT_APP_IOT_WEB_API=${{ steps.secretsAction.outputs.REACT-APP-IOT-WEB-API }}" >> .env
           echo "REACT_APP_IOT_WEB_API_SCOPE=${{ steps.secretsAction.outputs.REACT-APP-IOT-WEB-API-SCOPE }}" >> .env
-          ls -ltr
+          ls
 
       - name: npm install, build, and test
         run: |
