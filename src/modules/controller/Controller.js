@@ -19,9 +19,7 @@ const Controller = ({ device, objectId }) => {
   const [adjustersStatus, setAdjustersStatus] = useState({})
 
   useEffect(() => {
-    const fetchData = async () => {
-      const response = await axiosAgent.Device.get(device.deviceId, {'user':objectId});
-
+    axiosAgent.Device.get(device.deviceId, {'user':objectId}).then(response => {
       const controllersRes = IotUtils.getReportedProperty(response[0], 'Controllers');
       if(controllersRes !== null){
         try {
@@ -44,9 +42,9 @@ const Controller = ({ device, objectId }) => {
           toast.error(`Cannot get controller Commands Status`);
         }
       }
-
-    };
-    fetchData();
+    }).catch(error =>{
+      toast.error(error);
+    });
   }, [device, objectId]);
 
   const getDirectMethodBody = (methodName, payload) => {

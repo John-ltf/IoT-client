@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, memo } from 'react';
 import axiosAgent from '../../api/apiAgents';
 import {Segment, Grid} from 'semantic-ui-react';
-
+import { toast } from 'react-toastify';
 import DeviceCard from './DeviceCard';
 import DeviceInfoProps from './DeviceInfoProps';
 
@@ -9,11 +9,11 @@ const DeviceInfo = ({ device, deleteDevice, objectId }) => {
   const [selectedDevice, setSelectedDevice] = useState(null);
 
   useEffect(() => {
-    const fetchData = async () => {
-      const response = await axiosAgent.Device.get(device.deviceId, {'user':objectId});
+    axiosAgent.Device.get(device.deviceId, {'user':objectId}).then(response => {
       setSelectedDevice(response[0]);
-    };
-    fetchData()
+    }).catch(error =>{
+      toast.error(error);
+    });
   }, [device, objectId]);
 
   const resetSelectedDevice = useCallback(

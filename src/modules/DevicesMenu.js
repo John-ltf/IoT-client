@@ -1,18 +1,21 @@
 import React, { useState, useEffect, memo } from 'react'
+import { toast } from 'react-toastify';
 import { Dropdown } from 'semantic-ui-react';
 import axiosAgent from '../api/apiAgents';
 import uuid from 'react-uuid';
 
-const DevicesMenu = ({ fetchTrigger, showDevice, objectId }) => {
+const DevicesMenu = ({ fetchTrigger, showDevice, objectId, IoTApiAccessToken }) => {
   const [devices, setDevices] = useState([])
 
   useEffect(() => {
-    const fetchData = async () => {
-      const response = await axiosAgent.Devices.list( {'user':objectId});
+    if(IoTApiAccessToken === null)
+      return;
+    axiosAgent.Devices.list( {'user':objectId}).then(response => {
       setDevices(response);
-    };
-    fetchData()
-  }, [fetchTrigger, objectId]);
+    }).catch(error =>{
+      toast.error(error);
+    });
+  }, [fetchTrigger, objectId, IoTApiAccessToken]);
 
   function selectdevice(deviceId, nickName){
     showDevice(deviceId, nickName);

@@ -1,17 +1,40 @@
 import React, { useState, useEffect } from 'react'
 import { AuthenticatedTemplate, UnauthenticatedTemplate, useMsal } from "@azure/msal-react";
-import { InteractionRequiredAuthError } from "@azure/msal-browser";
-import { loginRequest, b2cPolicies } from "../authConfig";
-import { Button, Menu, Icon } from 'semantic-ui-react'
+import { InteractionStatus, InteractionRequiredAuthError } from "@azure/msal-browser";
+import { loginRequest, b2cPolicies, protectedResources } from "../authConfig";
+import { Menu, Icon } from 'semantic-ui-react'
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import axiosAgent from '../api/apiAgents';
 
 import DevicesMenu from './DevicesMenu';
 
 export const MainMenu = ({setOid, fetchTrigger, newDevice, triggers, showDevice}) => {
-    const { instance, accounts } = useMsal();
+    const { instance, accounts, inProgress  } = useMsal();
     const [objectId, setObjectId] = useState(null);
     const [username, setUsername] = useState(null);
+    const [IoTApiAccessToken, setIoTApiAccessToken] = useState(null);
+
+    const acquireToken = () =>{
+        if (accounts.length > 0) {
+            instance.acquireTokenSilent({
+                scopes: protectedResources.iotApi.scopes,
+                account: accounts[0]
+            }).then((response) => {
+                axiosAgent.setIoTApiAccessToken(response.accessToken)
+                setIoTApiAccessToken(response.accessToken)
+            }).catch((error) => {
+                if (error instanceof InteractionRequiredAuthError) {
+                    instance.acquireTokenPopup({
+                        scopes: protectedResources.iotApi.scopes,
+                    }).then((response) => {
+                        axiosAgent.setIoTApiAccessToken(response.accessToken)
+                        setIoTApiAccessToken(response.accessToken)
+                    }).catch(error => console.log(error));
+                }
+            });
+        }
+    }
 
     useEffect(() => {
         if (accounts.length > 0) {
@@ -24,6 +47,7 @@ export const MainMenu = ({setOid, fetchTrigger, newDevice, triggers, showDevice}
                 setObjectId(jwt["oid"]);
                 setOid(jwt["oid"]);
                 setUsername(jwt["name"]);
+                acquireToken();
             }).catch(error => {
                 if (error instanceof InteractionRequiredAuthError) {
                     instance.acquireTokenPopup(request).then(response => {
@@ -38,6 +62,8 @@ export const MainMenu = ({setOid, fetchTrigger, newDevice, triggers, showDevice}
         else {
             setObjectId(null);
             setUsername(null);
+            axiosAgent.setIoTApiAccessToken(null)
+            setIoTApiAccessToken(null);
         }
     }, [accounts]);
 
@@ -70,7 +96,11 @@ export const MainMenu = ({setOid, fetchTrigger, newDevice, triggers, showDevice}
                     <Menu.Item icon='add' content='New Device' onClick={newdevice} />
                     <Menu.Item icon='play' content='Triggers' onClick={triggersPanel} />
                     <Menu.Item>
-                        <DevicesMenu fetchTrigger={fetchTrigger} showDevice={showDevice} objectId={objectId} />
+                        {
+                            (objectId !== null && IoTApiAccessToken !== null)?
+                                <DevicesMenu fetchTrigger={fetchTrigger} showDevice={showDevice} objectId={objectId} IoTApiAccessToken={IoTApiAccessToken} />
+                            : <></>
+                        }
                     </Menu.Item>
                     <Menu.Menu position='right'>
                         <Menu.Item icon='copy' content="Copy your ID" onClick={() => copyId()} />
