@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { AuthenticatedTemplate, UnauthenticatedTemplate, useMsal } from "@azure/msal-react";
-import { InteractionStatus, InteractionRequiredAuthError } from "@azure/msal-browser";
-import { loginRequest, b2cPolicies, protectedResources } from "../authConfig";
+import { InteractionRequiredAuthError } from "@azure/msal-browser";
+import { loginRequest, b2cPolicies, protectedIoTResources, protectedFuncResources } from "../authConfig";
 import { Menu, Icon } from 'semantic-ui-react'
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -10,26 +10,29 @@ import axiosAgent from '../api/apiAgents';
 import DevicesMenu from './DevicesMenu';
 
 export const MainMenu = ({setOid, fetchTrigger, newDevice, triggers, showDevice}) => {
-    const { instance, accounts, inProgress  } = useMsal();
+    const { instance, accounts  } = useMsal();
     const [objectId, setObjectId] = useState(null);
     const [username, setUsername] = useState(null);
     const [IoTApiAccessToken, setIoTApiAccessToken] = useState(null);
+    const [IoTFuncApiAccessToken, setFuncIoTApiAccessToken] = useState(null);
 
-    const acquireToken = () =>{
+    const acquireToken = async (scope, setAccessTokenHandler, axioSetAccessTokenHandler) =>{
         if (accounts.length > 0) {
             instance.acquireTokenSilent({
-                scopes: protectedResources.iotApi.scopes,
+                scopes: scope,
                 account: accounts[0]
             }).then((response) => {
-                axiosAgent.setIoTApiAccessToken(response.accessToken)
-                setIoTApiAccessToken(response.accessToken)
+                axioSetAccessTokenHandler(response.accessToken)
+                setAccessTokenHandler(response.accessToken)
+                return response.accessToken
             }).catch((error) => {
                 if (error instanceof InteractionRequiredAuthError) {
                     instance.acquireTokenPopup({
-                        scopes: protectedResources.iotApi.scopes,
+                        scopes: scope,
                     }).then((response) => {
-                        axiosAgent.setIoTApiAccessToken(response.accessToken)
-                        setIoTApiAccessToken(response.accessToken)
+                        axioSetAccessTokenHandler(response.accessToken)
+                        setAccessTokenHandler(response.accessToken)
+                        return response.accessToken
                     }).catch(error => console.log(error));
                 }
             });
@@ -42,12 +45,14 @@ export const MainMenu = ({setOid, fetchTrigger, newDevice, triggers, showDevice}
                 scopes: ["openid"],
                 account: accounts[0]
             };
-            instance.acquireTokenSilent(request).then(response => {
+            instance.acquireTokenSilent(request).then(async (response) => {
                 const jwt = JSON.parse(atob(response.idToken.split('.')[1]));
                 setObjectId(jwt["oid"]);
                 setOid(jwt["oid"]);
                 setUsername(jwt["name"]);
-                acquireToken();
+                await acquireToken(protectedIoTResources.iotApi.scopes, setIoTApiAccessToken, axiosAgent.setIoTApiAccessToken);
+                await acquireToken(protectedFuncResources.iotApi.scopes, setFuncIoTApiAccessToken, axiosAgent.setFuncIoTApiAccessToken);
+
             }).catch(error => {
                 if (error instanceof InteractionRequiredAuthError) {
                     instance.acquireTokenPopup(request).then(response => {
@@ -62,8 +67,10 @@ export const MainMenu = ({setOid, fetchTrigger, newDevice, triggers, showDevice}
         else {
             setObjectId(null);
             setUsername(null);
-            axiosAgent.setIoTApiAccessToken(null)
+            axiosAgent.setIoTApiAccessToken(null);
             setIoTApiAccessToken(null);
+            axiosAgent.setFuncIoTApiAccessToken(null);
+            setFuncIoTApiAccessToken(null);
         }
     }, [accounts]);
 

@@ -8,23 +8,22 @@ axios.defaults.baseURL = process.env.REACT_APP_API_URL;
 var IoTApiHeader = {
   'Authorization': ''
 }
+var IoTFuncApiHeader = {
+  'Authorization': ''
+}
+
+var IoTMessagingHeaders = {
+  'accept': 'text/plain',
+  'Content-Type': 'application/json'
+}
 
 const setIoTApiAccessToken = (accessToken) => {
-  //alert(accessToken)
   IoTApiHeader['Authorization'] = `Bearer ${accessToken}`;
+  IoTMessagingHeaders['Authorization'] = `Bearer ${accessToken}`;
+}
 
-  //axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
-  /*axios.interceptors.request.use(
-    config => {
-      const token = window.localStorage.getItem('jwt');
-      alert(token)
-      //if (token) config.headers.Authorization = `Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6Ilg1ZVhrNHh5b2pORnVtMWtsMll0djhkbE5QNC1jNTdkTzZRR1RWQndhTmsifQ.eyJleHAiOjE2NjY3NzY5NTksIm5iZiI6MTY2Njc3MzM1OSwidmVyIjoiMS4wIiwiaXNzIjoiaHR0cHM6Ly9qb2hubHRmLmIyY2xvZ2luLmNvbS9lYmFiM2VkNi0wM2NlLTQwZWUtYjk5OS04NDk3MzAyODExMTkvdjIuMC8iLCJzdWIiOiJhYzE1ZDVjNi0yODUxLTRkOGYtOGRlMy03YjBlM2VkNTZmODAiLCJhdWQiOiJmMzY3MWY4OS1kZTE3LTRlYjMtYjI0ZC04ZWZiZDFiNTFlYWEiLCJub25jZSI6ImRlZmF1bHROb25jZSIsImlhdCI6MTY2Njc3MzM1OSwiYXV0aF90aW1lIjoxNjY2NzczMzU5LCJuYW1lIjoiR2lhbm5pcyBMYXRpZmlzIiwiaWRwIjoiZ29vZ2xlLmNvbSIsImNvdW50cnkiOiJHcmVlY2UiLCJlbWFpbHMiOlsibGF0aWZpcy5naWFubmlzQGdtYWlsLmNvbSJdLCJ0ZnAiOiJCMkNfMV9zaWdudXBzaWduaW4xIn0.qBP8wtt2PKGE1FrbimVUf6C3Z_bammIIeZ_jw-t8QhK4F6cPh4amkKO0nFqHvmtRIU70017PQJuhWbCqoFk4Xq9FkgALia0QPkVbO4l-VWDVdq2rmUmluAX0Q7b5rkKs1uEOGkWRywXkLxonwBGUbyQmhOsj_faq98wihqClB8Qrxo4FGSfmI0sEmtpzidQa7mlTt_u3yB9LfvusUeFKEVTgk5EmWwl-NcVIrbZyRj0CV-ZlAc5ERUH43voWn-olCgADK95K4Xnd6Kuu4qO_3NXT2cQg-E6_PQOueESXdtigzfX76o4psEkIDnTHUr5Bd2cBG4wYJ3RJei9U88NYiw`;
-      return config;
-    },
-    error => {
-      return Promise.reject(error);
-    }
-  );*/
+const setFuncIoTApiAccessToken = (accessToken) => {
+  IoTFuncApiHeader['Authorization'] = `Bearer ${accessToken}`;
 }
 
 axios.interceptors.response.use(response => response, error => {
@@ -65,15 +64,12 @@ const Device = {
 
 const History = {
   fetch: (device, timestart, parameters) =>
-    axios.get(`${process.env.REACT_APP_SIGNALR_URL}/api/history/${device}/${timestart}`, { params: parameters }).then(responseBody),
+    axios.get(`${process.env.REACT_APP_SIGNALR_URL}/api/history/${device}/${timestart}`, { headers: IoTFuncApiHeader, params: parameters }).then(responseBody),
   delete: (device, telemetryId, body) =>
-    axios.post(`${process.env.REACT_APP_SIGNALR_URL}/api/delete/${device}/${telemetryId}`, body).then(responseBody)
+    axios.post(`${process.env.REACT_APP_SIGNALR_URL}/api/delete/${device}/${telemetryId}`, body, { headers: IoTFuncApiHeader }).then(responseBody)
 }
 
-const IoTMessagingHeaders = {
-  'accept': 'text/plain',
-  'Content-Type': 'application/json'
-}
+
 const IoTMessaging = {
   directMethod: (deviceId, body) =>
     axios.post(`${process.env.REACT_APP_API_IOT_MSG_URL}/direct-method/${deviceId}`, body, {headers: IoTMessagingHeaders }).then(responseBody)
@@ -90,7 +86,7 @@ const client = axios.create({
 
 const signalR = {
   init: (endpoint, user, functionHandler) =>
-    client.post(`/api/negotiate/${endpoint}?userid=${user}`, null).then(resp => {
+    client.post(`/api/negotiate/${endpoint}?userid=${user}`, null, {headers: IoTFuncApiHeader }).then(resp => {
       const info = resp.data;
       info.accessToken = info.AccessToken || info.accessKey;
       info.url = info.Url || info.endpoint;
@@ -101,6 +97,7 @@ const signalR = {
         .withUrl(info.url, options)
         .build();
       functionHandler(newConnection);
+      console.log(newConnection)
     }).catch(error =>{
       toast.error(error);
     }),
@@ -120,6 +117,7 @@ const signalR = {
 
 export default {
   setIoTApiAccessToken,
+  setFuncIoTApiAccessToken,
   client,
   Devices,
   Device,

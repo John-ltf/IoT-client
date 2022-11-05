@@ -58,13 +58,20 @@ export const msalConfig = {
     }
 };
 
-export const protectedResources = {
+export const protectedIoTResources = {
     iotApi: {
         endpoint: "http://localhost:5000/hello",
         scopes: [`https://${process.env.REACT_APP_TENANT}.onmicrosoft.com/${process.env.REACT_APP_IOT_WEB_API}/${process.env.REACT_APP_IOT_WEB_API_SCOPE}`],
     },
 }
 
+export const protectedFuncResources = {
+    iotApi: {
+        endpoint: "http://localhost:5000/hello",
+        scopes: [`https://${process.env.REACT_APP_TENANT}.onmicrosoft.com/${process.env.REACT_APP_IOT_FUNC_API}/${process.env.REACT_APP_IOT_FUNC_API_SCOPE}`],
+    },
+}
+
  export const loginRequest = {
-    scopes: [...protectedResources.iotApi.scopes]
+    scopes: [...protectedIoTResources.iotApi.scopes]
 };

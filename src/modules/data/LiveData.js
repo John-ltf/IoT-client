@@ -1,4 +1,4 @@
-import {Statistic, Label, Header, Segment, Dimmer, Loader} from 'semantic-ui-react';
+import {Statistic, Label, Header, Dimmer, Loader} from 'semantic-ui-react';
 import React, { memo } from 'react';
 import IotUtils from '../../common/IoTutils';
 
