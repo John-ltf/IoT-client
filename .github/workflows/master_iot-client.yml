@@ -49,6 +49,8 @@ jobs:
           echo "REACT_APP_CLIENT_ID='${{ steps.secretsAction.outputs.REACT-APP-CLIENT-ID }}'" >> .env.production
           echo "REACT_APP_IOT_WEB_API='${{ steps.secretsAction.outputs.REACT-APP-IOT-WEB-API }}'" >> .env.production
           echo "REACT_APP_IOT_WEB_API_SCOPE='${{ steps.secretsAction.outputs.REACT-APP-IOT-WEB-API-SCOPE }}'" >> .env.production
+          echo "REACT_APP_IOT_FUNC_API='${{ steps.secretsAction.outputs.REACT-APP-IOT-FUNC-API }}'" >> .env.production
+          echo "REACT_APP_IOT_FUNC_API_SCOPE='${{ steps.secretsAction.outputs.REACT-APP-IOT-FUNC-API-SCOPEE }}'" >> .env.production
           ls
           cat .env.production
 
