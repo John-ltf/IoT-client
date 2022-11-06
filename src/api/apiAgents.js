@@ -97,7 +97,6 @@ const signalR = {
         .withUrl(info.url, options)
         .build();
       functionHandler(newConnection);
-      console.log(newConnection)
     }).catch(error =>{
       toast.error(error);
     }),
