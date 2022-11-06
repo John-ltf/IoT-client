@@ -20,6 +20,8 @@ const DeviceData = ({ device, deleteDevice, objectId}) => {
   const [ deviceHistoryData, setDeviceHistoryData] = useState(null);
   const [telemetryData, setTelemetryData] = useState(false)
   const [controller, setController] = useState(false)
+  const [tabIndex, setTabIndex] = useState(0)
+  const [metricType, setMetricType] = useState(null);
 
    useEffect(() => {
     Data.deviceReset();
@@ -108,6 +110,10 @@ const DeviceData = ({ device, deleteDevice, objectId}) => {
     toast.error('disconnected');
   }
 
+  const handleTab = (e, data) => {
+    setTabIndex(data.activeIndex)
+  }
+
   function OtherData({telemetryData, deviceHistoryData}){
 
     if(deviceHistoryData === null)
@@ -128,7 +134,7 @@ const DeviceData = ({ device, deleteDevice, objectId}) => {
       render: () => <HistoryDataTable deviceData={deviceHistoryData} ></HistoryDataTable>
     }
     if(telemetryData)
-      return (<Tab menu={{ pointing: true }} panes={[InfoDataPane, ChartDataPane, historyDataPane]} />)
+      return (<Tab onTabChange={handleTab} defaultActiveIndex={tabIndex} menu={{ pointing: true }} panes={[InfoDataPane, ChartDataPane, historyDataPane]} />)
     return (<Tab menu={{ pointing: true }} panes={[InfoDataPane]} />)
   }
 
