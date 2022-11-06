@@ -2,15 +2,10 @@ html,body {
   min-height: 100%;
   margin: 0px;
   padding: 0px;
-  width: fit-content;
-  block-size: fit-content;
-
 }
 #root {
   background: #282c34;
   min-height: 100%;
-  width: fit-content;
-  block-size: fit-content;
 }
 
 .segmentClass {
